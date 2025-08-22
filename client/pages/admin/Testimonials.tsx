@@ -5,12 +5,19 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Star, Save, Upload, Image as ImageIcon } from "lucide-react";
+import { Star, Save, Upload, Image as ImageIcon, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/lib/supabaseClient";
 import { upsertSingletonWithFixedId } from "@/lib/supabase-helpers";
 import { useRealTimeSync } from "@/hooks/use-data-sync";
 import { logDatabaseError } from "@/lib/error-handler";
+import { uploadImageToSupabase } from "@/lib/imageUpload";
+import {
+  showUploadSuccess,
+  showUploadError,
+  showSaveSuccess,
+  showSaveError,
+} from "@/lib/notifications";
 
 interface CustomerReview {
   name: string;
@@ -18,6 +25,7 @@ interface CustomerReview {
   text: string;
   date: string;
   verified: boolean;
+  image?: string; // URL for customer profile image
 }
 
 interface CustomerReviewsData {
@@ -38,6 +46,7 @@ const defaultCustomerReviewsData: CustomerReviewsData = {
       text: "Amazing variety! Perfect for our office team. Everyone loved the selection of snacks.",
       date: "2 weeks ago",
       verified: true,
+      image: "",
     },
     {
       name: "Mike D.",
@@ -45,6 +54,7 @@ const defaultCustomerReviewsData: CustomerReviewsData = {
       text: "Great gift idea! Sent this to my college son and he was thrilled with all the different snacks.",
       date: "1 month ago",
       verified: true,
+      image: "",
     },
     {
       name: "Lisa K.",
@@ -52,6 +62,7 @@ const defaultCustomerReviewsData: CustomerReviewsData = {
       text: "Good quality snacks and fast delivery. Would definitely order again.",
       date: "3 weeks ago",
       verified: true,
+      image: "",
     },
     {
       name: "James T.",
@@ -59,6 +70,7 @@ const defaultCustomerReviewsData: CustomerReviewsData = {
       text: "Excellent quality and presentation. The packaging is beautiful and the snacks are fresh and delicious.",
       date: "1 week ago",
       verified: true,
+      image: "",
     },
     {
       name: "Emily R.",
@@ -66,6 +78,7 @@ const defaultCustomerReviewsData: CustomerReviewsData = {
       text: "Perfect for our company break room! Everyone keeps asking where we got these amazing snacks.",
       date: "5 days ago",
       verified: true,
+      image: "",
     },
     {
       name: "David C.",
@@ -73,6 +86,7 @@ const defaultCustomerReviewsData: CustomerReviewsData = {
       text: "Great variety and fast shipping. My kids love the breakfast bars and I enjoy the healthier options.",
       date: "4 days ago",
       verified: true,
+      image: ""
     },
   ],
 };
