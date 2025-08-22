@@ -14,6 +14,7 @@ interface Review {
   text: string;
   date: string;
   verified: boolean;
+  image?: string; // URL for customer profile image
 }
 
 interface ReviewsData {
@@ -40,6 +41,7 @@ const defaultReviewsData: ReviewsData = {
       text: "Amazing variety! Perfect for our office team. Everyone loved the selection of snacks.",
       date: "2 weeks ago",
       verified: true,
+      image: "",
     },
     {
       name: "Mike D.",
@@ -47,6 +49,7 @@ const defaultReviewsData: ReviewsData = {
       text: "Great gift idea! Sent this to my college son and he was thrilled with all the different snacks.",
       date: "1 month ago",
       verified: true,
+      image: "",
     },
     {
       name: "Lisa K.",
@@ -54,6 +57,7 @@ const defaultReviewsData: ReviewsData = {
       text: "Good quality snacks and fast delivery. Would definitely order again.",
       date: "3 weeks ago",
       verified: true,
+      image: "",
     },
     {
       name: "James T.",
@@ -61,6 +65,7 @@ const defaultReviewsData: ReviewsData = {
       text: "Excellent quality and presentation. The packaging is beautiful and the snacks are fresh and delicious.",
       date: "1 week ago",
       verified: true,
+      image: "",
     },
     {
       name: "Emily R.",
@@ -68,6 +73,7 @@ const defaultReviewsData: ReviewsData = {
       text: "Perfect for our company break room! Everyone keeps asking where we got these amazing snacks.",
       date: "5 days ago",
       verified: true,
+      image: "",
     },
     {
       name: "David C.",
@@ -75,6 +81,7 @@ const defaultReviewsData: ReviewsData = {
       text: "Great variety and fast shipping. My kids love the breakfast bars and I enjoy the healthier options.",
       date: "4 days ago",
       verified: true,
+      image: "",
     },
   ],
 };

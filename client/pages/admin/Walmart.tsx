@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Star, Save, Link as LinkIcon } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
+import { upsertSingletonWithFixedId } from "@/lib/supabase-helpers";
 import { cn } from "@/lib/utils";
 import { useRealTimeSync } from "@/hooks/use-data-sync";
 import { logDatabaseError } from "@/lib/error-handler";
@@ -126,12 +127,13 @@ export default function Walmart() {
     try {
       console.log("Saving trust data:", trustData);
 
-      // Save to Supabase trust_section table
-      const { data, error } = await supabase.from("trust_section").upsert({
-        id: 1,
-        content: trustData,
-        updated_at: new Date().toISOString(),
-      });
+      // Save to Supabase trust_section table using UUID-compatible helper
+      const { data, error } = await upsertSingletonWithFixedId(
+        "trust_section",
+        {
+          content: trustData,
+        },
+      );
 
       if (error) {
         if (error.code === "42P01" || error.code === "PGRST116") {

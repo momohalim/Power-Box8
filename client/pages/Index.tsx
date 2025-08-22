@@ -33,6 +33,7 @@ import { CustomerReviews } from "@/components/CustomerReviews";
 import { EnhancedExitIntentPopup } from "@/components/EnhancedExitIntentPopup";
 import { ProductPopup } from "@/components/ProductPopup";
 import { DatabaseFixPanel } from "@/components/DatabaseFixPanel";
+import { Database406Fix } from "@/components/Database406Fix";
 import { useExitIntent } from "@/hooks/use-exit-intent";
 
 export default function Index() {
@@ -111,6 +112,9 @@ export default function Index() {
     <>
       {/* Database Fix Panel - provides clear instructions to fix database errors */}
       <DatabaseFixPanel />
+
+      {/* 406 Error Fix Banner - shows when specific 406 errors are detected */}
+      <Database406Fix />
 
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 relative overflow-hidden">
         {/* Floating Snack Animations */}

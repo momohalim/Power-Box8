@@ -43,11 +43,17 @@ const ReviewCard = ({
     <div className="flex justify-center mb-4">
       <img
         src={review.photo}
-        alt={review.name}
+        alt={`${review.name} profile`}
         className="w-14 h-14 rounded-full object-cover border-3 border-white shadow-md"
         loading="lazy"
         width={56}
         height={56}
+        onError={(e) => {
+          // Fallback to a default avatar if image fails to load
+          const target = e.target as HTMLImageElement;
+          const index = customerReviews.findIndex((r) => r.id === review.id);
+          target.src = defaultPhotos[index % defaultPhotos.length];
+        }}
       />
     </div>
 
@@ -76,12 +82,16 @@ const ReviewCard = ({
 export function CustomerReviews() {
   const { reviewsData } = useReviews();
 
-  // Map backend reviews data to component format with placeholder photos
+  // Map backend reviews data to component format with uploaded or placeholder photos
   const customerReviews: CustomerReview[] = reviewsData.reviews.map(
     (review, index) => ({
       id: index + 1,
       name: review.name,
-      photo: defaultPhotos[index % defaultPhotos.length],
+      // Use uploaded image if available, otherwise fallback to placeholder
+      photo:
+        review.image && review.image.trim() !== ""
+          ? review.image
+          : defaultPhotos[index % defaultPhotos.length],
       rating: review.rating,
       review: review.text,
     }),
