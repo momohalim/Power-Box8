@@ -1,4 +1,5 @@
 import { DatabaseSetupInfo } from "@/components/DatabaseSetupInfo";
+import { DatabaseDiagnosis } from "@/components/DatabaseDiagnosis";
 import { AdminSystemTest } from "@/components/AdminSystemTest";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -112,6 +113,17 @@ export default function Dashboard() {
 
       {/* Database Setup Info */}
       <DatabaseSetupInfo />
+
+      {/* Database Diagnosis Tool */}
+      <div className="space-y-6">
+        <div className="flex items-center gap-2">
+          <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+          <span className="text-lg font-semibold text-gray-700">
+            Database Status & Fix Tool
+          </span>
+        </div>
+        <DatabaseDiagnosis />
+      </div>
 
       {/* System Test Suite */}
       <AdminSystemTest />
