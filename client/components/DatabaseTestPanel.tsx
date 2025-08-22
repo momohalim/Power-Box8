@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/lib/supabaseClient";
+import { upsertSingletonWithFixedId } from "@/lib/supabase-helpers";
 import {
   createTestAdminUser,
   signInAsTestAdmin,
@@ -60,10 +61,8 @@ export function DatabaseTestPanel() {
         guarantee: { text: "Test", subtext: "Test" },
       };
 
-      const { data, error } = await supabase.from("trust_section").upsert({
-        id: 999, // Use a test ID
+      const { data, error } = await upsertSingletonWithFixedId("trust_section", {
         content: testData,
-        updated_at: new Date().toISOString(),
       });
 
       if (error) {
