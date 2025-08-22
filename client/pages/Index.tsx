@@ -33,6 +33,7 @@ import { CustomerReviews } from "@/components/CustomerReviews";
 import { EnhancedExitIntentPopup } from "@/components/EnhancedExitIntentPopup";
 import { ProductPopup } from "@/components/ProductPopup";
 import { DatabaseFixPanel } from "@/components/DatabaseFixPanel";
+import { DatabaseDiagnosis } from "@/components/DatabaseDiagnosis";
 import { useExitIntent } from "@/hooks/use-exit-intent";
 
 export default function Index() {
@@ -111,6 +112,11 @@ export default function Index() {
     <>
       {/* Database Fix Panel - provides clear instructions to fix database errors */}
       <DatabaseFixPanel />
+
+      {/* Database Diagnosis Tool - shows detailed status of each table */}
+      <div className="fixed top-20 left-4 z-40">
+        <DatabaseDiagnosis />
+      </div>
 
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 relative overflow-hidden">
         {/* Floating Snack Animations */}
