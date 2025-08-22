@@ -1,7 +1,13 @@
 import { useState, useEffect } from "react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { Copy, AlertTriangle, CheckCircle, Database, ExternalLink } from "lucide-react";
+import {
+  Copy,
+  AlertTriangle,
+  CheckCircle,
+  Database,
+  ExternalLink,
+} from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 
 export function Database406Fix() {
@@ -12,10 +18,10 @@ export function Database406Fix() {
   // Tables causing 406 errors according to user report
   const problematicTables = [
     "trust_section",
-    "seo_settings", 
+    "seo_settings",
     "product_popup",
     "offer_pricing",
-    "exit_intent_popup"
+    "exit_intent_popup",
   ];
 
   const check406Issues = async () => {
@@ -153,26 +159,23 @@ SELECT '🎉 406 errors fixed! Reload your website to test.' as result;`;
                 🚨 Database 406 Errors Detected
               </p>
               <p className="text-sm text-red-700">
-                Data changes are saved but don't persist after page reload. 
-                Tables: trust_section, seo_settings, product_popup, offer_pricing, exit_intent_popup
+                Data changes are saved but don't persist after page reload.
+                Tables: trust_section, seo_settings, product_popup,
+                offer_pricing, exit_intent_popup
               </p>
             </div>
 
             <div className="flex flex-wrap gap-2">
-              <Button 
-                onClick={copySQL} 
+              <Button
+                onClick={copySQL}
                 size="sm"
                 className="flex items-center gap-2 bg-red-600 hover:bg-red-700"
               >
                 <Copy className="h-4 w-4" />
                 {copied ? "Copied!" : "Copy Fix SQL"}
               </Button>
-              
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={recheck}
-              >
+
+              <Button variant="outline" size="sm" onClick={recheck}>
                 <CheckCircle className="h-4 w-4 mr-2" />
                 Re-check
               </Button>
@@ -187,13 +190,18 @@ SELECT '🎉 406 errors fixed! Reload your website to test.' as result;`;
             </div>
 
             <div className="text-xs text-red-600 bg-red-100 p-3 rounded-lg">
-              <p><strong>📋 Quick Fix Instructions:</strong></p>
+              <p>
+                <strong>📋 Quick Fix Instructions:</strong>
+              </p>
               <ol className="list-decimal list-inside space-y-1 mt-1">
                 <li>Click "Copy Fix SQL" above</li>
                 <li>Go to your Supabase Dashboard → SQL Editor</li>
                 <li>Paste and run the SQL script</li>
                 <li>Click "Re-check" to verify the fix</li>
-                <li>Test: Save changes in admin → Reload page → Data should persist</li>
+                <li>
+                  Test: Save changes in admin → Reload page → Data should
+                  persist
+                </li>
               </ol>
             </div>
           </div>

@@ -128,9 +128,12 @@ export default function Walmart() {
       console.log("Saving trust data:", trustData);
 
       // Save to Supabase trust_section table using UUID-compatible helper
-      const { data, error } = await upsertSingletonWithFixedId("trust_section", {
-        content: trustData,
-      });
+      const { data, error } = await upsertSingletonWithFixedId(
+        "trust_section",
+        {
+          content: trustData,
+        },
+      );
 
       if (error) {
         if (error.code === "42P01" || error.code === "PGRST116") {

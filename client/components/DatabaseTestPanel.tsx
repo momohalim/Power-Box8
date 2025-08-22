@@ -61,9 +61,12 @@ export function DatabaseTestPanel() {
         guarantee: { text: "Test", subtext: "Test" },
       };
 
-      const { data, error } = await upsertSingletonWithFixedId("trust_section", {
-        content: testData,
-      });
+      const { data, error } = await upsertSingletonWithFixedId(
+        "trust_section",
+        {
+          content: testData,
+        },
+      );
 
       if (error) {
         addResult(`❌ Write error: ${error.message}`);

@@ -3,7 +3,15 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Copy, Database, ExternalLink, Loader2, CheckCircle, AlertTriangle, XCircle } from "lucide-react";
+import {
+  Copy,
+  Database,
+  ExternalLink,
+  Loader2,
+  CheckCircle,
+  AlertTriangle,
+  XCircle,
+} from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 
 interface TableStatus {
@@ -23,10 +31,10 @@ export function DatabaseDiagnosis() {
   // Tables that are causing 406 errors according to user report
   const problematicTables = [
     "trust_section",
-    "seo_settings", 
+    "seo_settings",
     "product_popup",
     "offer_pricing",
-    "exit_intent_popup"
+    "exit_intent_popup",
   ];
 
   // All tables from schema
@@ -41,7 +49,7 @@ export function DatabaseDiagnosis() {
     "seo_settings",
     "product_popup",
     "exit_intent_popup",
-    "email_subscriptions"
+    "email_subscriptions",
   ];
 
   const checkTables = async () => {
@@ -70,11 +78,10 @@ export function DatabaseDiagnosis() {
           });
         } else {
           console.log(`✅ Table ${tableName} is accessible`);
-          
+
           // Check if it has content column by checking the data structure
-          const hasContentColumn = data && data.length > 0 ? 
-            'content' in data[0] : 
-            true; // Assume true if no data, we'll check structure separately
+          const hasContentColumn =
+            data && data.length > 0 ? "content" in data[0] : true; // Assume true if no data, we'll check structure separately
 
           statuses.push({
             name: tableName,
@@ -96,15 +103,22 @@ export function DatabaseDiagnosis() {
     setIsChecking(false);
 
     // Log summary
-    const workingTables = statuses.filter(t => t.exists);
-    const brokenTables = statuses.filter(t => !t.exists);
-    
+    const workingTables = statuses.filter((t) => t.exists);
+    const brokenTables = statuses.filter((t) => !t.exists);
+
     console.log(`📊 Database Diagnosis Summary:`);
-    console.log(`✅ Working tables: ${workingTables.length}/${allRequiredTables.length}`);
-    console.log(`❌ Broken tables: ${brokenTables.length}/${allRequiredTables.length}`);
-    
+    console.log(
+      `✅ Working tables: ${workingTables.length}/${allRequiredTables.length}`,
+    );
+    console.log(
+      `❌ Broken tables: ${brokenTables.length}/${allRequiredTables.length}`,
+    );
+
     if (brokenTables.length > 0) {
-      console.log(`🔧 Tables needing fixes:`, brokenTables.map(t => t.name));
+      console.log(
+        `🔧 Tables needing fixes:`,
+        brokenTables.map((t) => t.name),
+      );
     }
   };
 
@@ -112,8 +126,10 @@ export function DatabaseDiagnosis() {
     checkTables();
   }, []);
 
-  const brokenTables = tableStatuses.filter(t => !t.exists);
-  const problematicBroken = brokenTables.filter(t => problematicTables.includes(t.name));
+  const brokenTables = tableStatuses.filter((t) => !t.exists);
+  const problematicBroken = brokenTables.filter((t) =>
+    problematicTables.includes(t.name),
+  );
 
   // SQL to fix all missing tables with proper RLS policies
   const fullFixSQL = `-- =====================================================
@@ -125,28 +141,40 @@ export function DatabaseDiagnosis() {
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- Create missing tables with content JSONB column
-${brokenTables.map(table => `
+${brokenTables
+  .map(
+    (table) => `
 CREATE TABLE IF NOT EXISTS ${table.name} (
     id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
     content JSONB NOT NULL DEFAULT '{}'::jsonb,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);`).join('\n')}
+);`,
+  )
+  .join("\n")}
 
 -- Enable Row Level Security
-${brokenTables.map(table => `ALTER TABLE ${table.name} ENABLE ROW LEVEL SECURITY;`).join('\n')}
+${brokenTables.map((table) => `ALTER TABLE ${table.name} ENABLE ROW LEVEL SECURITY;`).join("\n")}
 
 -- Drop existing policies to avoid conflicts
-${brokenTables.map(table => `
+${brokenTables
+  .map(
+    (table) => `
 DROP POLICY IF EXISTS "Enable read access for all users" ON ${table.name};
 DROP POLICY IF EXISTS "Enable all operations for service role" ON ${table.name};
 DROP POLICY IF EXISTS "Enable all operations for authenticated users" ON ${table.name};
-DROP POLICY IF EXISTS "Enable all operations for all users" ON ${table.name};`).join('\n')}
+DROP POLICY IF EXISTS "Enable all operations for all users" ON ${table.name};`,
+  )
+  .join("\n")}
 
 -- Create permissive policies (for development/testing)
-${brokenTables.map(table => `
+${brokenTables
+  .map(
+    (table) => `
 CREATE POLICY "Enable read access for all users" ON ${table.name} FOR SELECT USING (true);
-CREATE POLICY "Enable all operations for all users" ON ${table.name} FOR ALL USING (true);`).join('\n')}
+CREATE POLICY "Enable all operations for all users" ON ${table.name} FOR ALL USING (true);`,
+  )
+  .join("\n")}
 
 -- Create email_subscriptions table if it doesn't exist
 CREATE TABLE IF NOT EXISTS email_subscriptions (
@@ -177,11 +205,16 @@ END;
 $$ language 'plpgsql';
 
 -- Add triggers for updated_at
-${brokenTables.filter(t => t.name !== 'email_subscriptions').map(table => `
+${brokenTables
+  .filter((t) => t.name !== "email_subscriptions")
+  .map(
+    (table) => `
 DROP TRIGGER IF EXISTS update_${table.name}_updated_at ON ${table.name};
 CREATE TRIGGER update_${table.name}_updated_at 
     BEFORE UPDATE ON ${table.name} 
-    FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();`).join('\n')}
+    FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();`,
+  )
+  .join("\n")}
 
 -- Success message
 SELECT '🎉 Database fix completed! All tables should now be accessible.' as result;`;
@@ -194,13 +227,15 @@ SELECT '🎉 Database fix completed! All tables should now be accessible.' as re
 
   const getStatusIcon = (table: TableStatus) => {
     if (table.exists) return <CheckCircle className="h-4 w-4 text-green-600" />;
-    if (problematicTables.includes(table.name)) return <XCircle className="h-4 w-4 text-red-600" />;
+    if (problematicTables.includes(table.name))
+      return <XCircle className="h-4 w-4 text-red-600" />;
     return <AlertTriangle className="h-4 w-4 text-yellow-600" />;
   };
 
   const getStatusColor = (table: TableStatus) => {
     if (table.exists) return "border-green-200 bg-green-50";
-    if (problematicTables.includes(table.name)) return "border-red-200 bg-red-50";
+    if (problematicTables.includes(table.name))
+      return "border-red-200 bg-red-50";
     return "border-yellow-200 bg-yellow-50";
   };
 
@@ -217,12 +252,14 @@ SELECT '🎉 Database fix completed! All tables should now be accessible.' as re
         {/* Summary */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="text-center p-3 bg-blue-50 rounded-lg">
-            <div className="text-2xl font-bold text-blue-600">{tableStatuses.length}</div>
+            <div className="text-2xl font-bold text-blue-600">
+              {tableStatuses.length}
+            </div>
             <div className="text-sm text-blue-600">Total Tables</div>
           </div>
           <div className="text-center p-3 bg-green-50 rounded-lg">
             <div className="text-2xl font-bold text-green-600">
-              {tableStatuses.filter(t => t.exists).length}
+              {tableStatuses.filter((t) => t.exists).length}
             </div>
             <div className="text-sm text-green-600">Working</div>
           </div>
@@ -261,7 +298,9 @@ SELECT '🎉 Database fix completed! All tables should now be accessible.' as re
                   </div>
                   <div className="text-sm">
                     {table.exists ? (
-                      <span className="text-green-600 font-medium">✓ Accessible</span>
+                      <span className="text-green-600 font-medium">
+                        ✓ Accessible
+                      </span>
                     ) : (
                       <span className="text-red-600 font-medium">
                         ✗ {table.errorCode || "Missing"}
@@ -290,9 +329,13 @@ SELECT '🎉 Database fix completed! All tables should now be accessible.' as re
                     Database Fix Required
                   </p>
                   <p className="text-sm text-orange-700">
-                    {brokenTables.length} tables are missing or inaccessible. 
+                    {brokenTables.length} tables are missing or inaccessible.
                     {problematicBroken.length > 0 && (
-                      <> This includes {problematicBroken.length} tables causing 406 errors.</>
+                      <>
+                        {" "}
+                        This includes {problematicBroken.length} tables causing
+                        406 errors.
+                      </>
                     )}
                   </p>
                 </div>
@@ -302,8 +345,8 @@ SELECT '🎉 Database fix completed! All tables should now be accessible.' as re
                     <Copy className="h-4 w-4" />
                     {copied ? "Copied!" : "Copy Fix SQL"}
                   </Button>
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     onClick={() => setShowSQL(!showSQL)}
                   >
                     {showSQL ? "Hide" : "Show"} SQL
@@ -315,7 +358,9 @@ SELECT '🎉 Database fix completed! All tables should now be accessible.' as re
 
                 {showSQL && (
                   <div className="mt-4">
-                    <div className="text-sm font-medium mb-2">SQL Fix Script:</div>
+                    <div className="text-sm font-medium mb-2">
+                      SQL Fix Script:
+                    </div>
                     <pre className="text-xs bg-gray-900 text-green-400 p-4 rounded-lg overflow-x-auto max-h-96">
                       {fullFixSQL}
                     </pre>
@@ -323,7 +368,9 @@ SELECT '🎉 Database fix completed! All tables should now be accessible.' as re
                 )}
 
                 <div className="text-xs text-orange-600">
-                  <p><strong>Instructions:</strong></p>
+                  <p>
+                    <strong>Instructions:</strong>
+                  </p>
                   <ol className="list-decimal list-inside space-y-1">
                     <li>Copy the SQL script above</li>
                     <li>Go to your Supabase Dashboard → SQL Editor</li>
@@ -340,10 +387,13 @@ SELECT '🎉 Database fix completed! All tables should now be accessible.' as re
           <Alert className="border-green-200 bg-green-50">
             <CheckCircle className="h-4 w-4" />
             <AlertDescription>
-              <p className="font-semibold text-green-800">All Tables Working!</p>
+              <p className="font-semibold text-green-800">
+                All Tables Working!
+              </p>
               <p className="text-sm text-green-700">
-                All database tables are accessible and should be working correctly.
-                If you're still experiencing issues, they may be related to RLS policies or network connectivity.
+                All database tables are accessible and should be working
+                correctly. If you're still experiencing issues, they may be
+                related to RLS policies or network connectivity.
               </p>
             </AlertDescription>
           </Alert>

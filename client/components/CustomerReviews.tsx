@@ -51,7 +51,7 @@ const ReviewCard = ({
         onError={(e) => {
           // Fallback to a default avatar if image fails to load
           const target = e.target as HTMLImageElement;
-          const index = customerReviews.findIndex(r => r.id === review.id);
+          const index = customerReviews.findIndex((r) => r.id === review.id);
           target.src = defaultPhotos[index % defaultPhotos.length];
         }}
       />
@@ -88,7 +88,10 @@ export function CustomerReviews() {
       id: index + 1,
       name: review.name,
       // Use uploaded image if available, otherwise fallback to placeholder
-      photo: review.image && review.image.trim() !== "" ? review.image : defaultPhotos[index % defaultPhotos.length],
+      photo:
+        review.image && review.image.trim() !== ""
+          ? review.image
+          : defaultPhotos[index % defaultPhotos.length],
       rating: review.rating,
       review: review.text,
     }),

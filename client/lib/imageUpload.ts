@@ -14,15 +14,22 @@ interface UploadResult {
  */
 export async function uploadImageToSupabase(
   file: File,
-  bucketType: string = "images"
+  bucketType: string = "images",
 ): Promise<UploadResult> {
   try {
     // Validate file type
-    const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp"];
+    const allowedTypes = [
+      "image/jpeg",
+      "image/jpg",
+      "image/png",
+      "image/gif",
+      "image/webp",
+    ];
     if (!allowedTypes.includes(file.type)) {
       return {
         success: false,
-        error: "Invalid file type. Please upload a JPEG, PNG, GIF, or WebP image.",
+        error:
+          "Invalid file type. Please upload a JPEG, PNG, GIF, or WebP image.",
       };
     }
 
@@ -89,7 +96,10 @@ export async function uploadImageToSupabase(
       };
     }
 
-    console.log(`✅ Image uploaded successfully to ${bucketName}:`, urlData.publicUrl);
+    console.log(
+      `✅ Image uploaded successfully to ${bucketName}:`,
+      urlData.publicUrl,
+    );
 
     return {
       success: true,
@@ -99,7 +109,10 @@ export async function uploadImageToSupabase(
     console.error("Image upload exception:", error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Unknown upload error occurred.",
+      error:
+        error instanceof Error
+          ? error.message
+          : "Unknown upload error occurred.",
     };
   }
 }
@@ -112,7 +125,7 @@ export async function uploadImageToSupabase(
  */
 export async function deleteImageFromSupabase(
   imageUrl: string,
-  bucketType: string = "images"
+  bucketType: string = "images",
 ): Promise<{ success: boolean; error?: string }> {
   try {
     // Extract filename from URL
@@ -161,7 +174,10 @@ export async function deleteImageFromSupabase(
     console.error("Image delete exception:", error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Unknown delete error occurred.",
+      error:
+        error instanceof Error
+          ? error.message
+          : "Unknown delete error occurred.",
     };
   }
 }

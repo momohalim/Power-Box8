@@ -86,7 +86,7 @@ const defaultCustomerReviewsData: CustomerReviewsData = {
       text: "Great variety and fast shipping. My kids love the breakfast bars and I enjoy the healthier options.",
       date: "4 days ago",
       verified: true,
-      image: ""
+      image: "",
     },
   ],
 };
@@ -532,7 +532,9 @@ export default function Testimonials() {
                           variant="outline"
                           size="sm"
                           onClick={() =>
-                            document.getElementById(`image-upload-${index}`)?.click()
+                            document
+                              .getElementById(`image-upload-${index}`)
+                              ?.click()
                           }
                         >
                           <Upload className="w-4 h-4 mr-2" />
@@ -554,13 +556,17 @@ export default function Testimonials() {
                     <div className="text-center space-y-3">
                       <ImageIcon className="w-12 h-12 text-gray-400 mx-auto" />
                       <div>
-                        <p className="text-gray-600 text-sm">No image uploaded</p>
+                        <p className="text-gray-600 text-sm">
+                          No image uploaded
+                        </p>
                         <Button
                           type="button"
                           variant="outline"
                           size="sm"
                           onClick={() =>
-                            document.getElementById(`image-upload-${index}`)?.click()
+                            document
+                              .getElementById(`image-upload-${index}`)
+                              ?.click()
                           }
                           className="mt-2"
                         >
@@ -583,11 +589,15 @@ export default function Testimonials() {
 
                 {/* URL input as alternative */}
                 <div>
-                  <Label htmlFor={`image-url-${index}`}>Or enter image URL:</Label>
+                  <Label htmlFor={`image-url-${index}`}>
+                    Or enter image URL:
+                  </Label>
                   <Input
                     id={`image-url-${index}`}
                     value={review.image || ""}
-                    onChange={(e) => handleImageUrlChange(index, e.target.value)}
+                    onChange={(e) =>
+                      handleImageUrlChange(index, e.target.value)
+                    }
                     placeholder="https://example.com/image.jpg"
                     className="mt-1"
                   />
