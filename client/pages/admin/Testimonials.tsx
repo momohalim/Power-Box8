@@ -150,8 +150,62 @@ export default function Testimonials() {
     handleReviewChange(index, "rating", newRating);
   };
 
-  // Note: Image upload functionality removed as customer reviews in the database schema don't include image URLs
-  // Reviews only store: name, rating, text, date, verified
+  // Image upload functionality for customer review profile photos
+  const handleImageUpload = async (
+    index: number,
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const originalImage = reviewsData.reviews[index].image || "";
+
+      try {
+        // Show loading state with temporary preview
+        const tempUrl = URL.createObjectURL(file);
+        handleReviewChange(index, "image", tempUrl);
+
+        // Upload using enhanced utility with customer_reviews bucket
+        const result = await uploadImageToSupabase(file, "customer_reviews");
+
+        if (result.success && result.url) {
+          // Update with actual Supabase URL
+          handleReviewChange(index, "image", result.url);
+
+          // Clean up temporary URL
+          URL.revokeObjectURL(tempUrl);
+
+          // Show success notification
+          showUploadSuccess(`Review ${index + 1} image`);
+        } else {
+          // Revert to original image on error
+          handleReviewChange(index, "image", originalImage);
+          URL.revokeObjectURL(tempUrl);
+
+          // Show specific error message
+          showUploadError(
+            result.error || "Failed to upload image",
+            `Review ${index + 1} image`,
+          );
+        }
+      } catch (error) {
+        // Revert to original image on error
+        handleReviewChange(index, "image", originalImage);
+        console.error("Image upload failed:", error);
+        showUploadError(
+          "Unexpected error during image upload. Please try again.",
+          `Review ${index + 1} image`,
+        );
+      }
+    }
+  };
+
+  const handleImageUrlChange = (index: number, url: string) => {
+    handleReviewChange(index, "image", url);
+  };
+
+  const handleRemoveImage = (index: number) => {
+    handleReviewChange(index, "image", "");
+  };
 
   const adjustOverallRating = (increment: number) => {
     const newRating = Math.max(
@@ -210,22 +264,20 @@ export default function Testimonials() {
           return;
         }
         logDatabaseError("Error saving customer reviews", error);
-        alert("Error saving Customer Reviews section. Please try again.");
+        showSaveError(
+          "Error saving Customer Reviews section. Please try again.",
+          "Customer Reviews",
+        );
       } else {
         // Show success notification
-        const notification = document.createElement("div");
-        notification.className =
-          "fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-md shadow-lg z-50";
-        notification.textContent = "Customer Reviews saved and synced!";
-        document.body.appendChild(notification);
-
-        setTimeout(() => {
-          document.body.removeChild(notification);
-        }, 3000);
+        showSaveSuccess("Customer Reviews section");
       }
     } catch (error) {
       logDatabaseError("Catch block - saving customer reviews error", error);
-      alert("Error saving Customer Reviews section. Please try again.");
+      showSaveError(
+        "Error saving Customer Reviews section. Please try again.",
+        "Customer Reviews",
+      );
     } finally {
       setIsSaving(false);
     }
@@ -457,6 +509,89 @@ export default function Testimonials() {
                   placeholder="Enter customer review..."
                   className="mt-1 min-h-[80px]"
                 />
+              </div>
+
+              {/* Customer Profile Image Upload */}
+              <div className="space-y-4">
+                <Label>Customer Profile Image</Label>
+
+                {/* Image Preview and Upload */}
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
+                  {review.image ? (
+                    <div className="space-y-3">
+                      <div className="flex justify-center">
+                        <img
+                          src={review.image}
+                          alt={`${review.name} profile`}
+                          className="w-20 h-20 rounded-full object-cover border-2 border-gray-200"
+                        />
+                      </div>
+                      <div className="flex gap-2 justify-center">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() =>
+                            document.getElementById(`image-upload-${index}`)?.click()
+                          }
+                        >
+                          <Upload className="w-4 h-4 mr-2" />
+                          Replace
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleRemoveImage(index)}
+                          className="text-red-600 hover:text-red-700"
+                        >
+                          <Trash2 className="w-4 h-4 mr-2" />
+                          Remove
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-center space-y-3">
+                      <ImageIcon className="w-12 h-12 text-gray-400 mx-auto" />
+                      <div>
+                        <p className="text-gray-600 text-sm">No image uploaded</p>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() =>
+                            document.getElementById(`image-upload-${index}`)?.click()
+                          }
+                          className="mt-2"
+                        >
+                          <Upload className="w-4 h-4 mr-2" />
+                          Upload Image
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Hidden file input */}
+                <input
+                  id={`image-upload-${index}`}
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => handleImageUpload(index, e)}
+                  className="hidden"
+                />
+
+                {/* URL input as alternative */}
+                <div>
+                  <Label htmlFor={`image-url-${index}`}>Or enter image URL:</Label>
+                  <Input
+                    id={`image-url-${index}`}
+                    value={review.image || ""}
+                    onChange={(e) => handleImageUrlChange(index, e.target.value)}
+                    placeholder="https://example.com/image.jpg"
+                    className="mt-1"
+                  />
+                </div>
               </div>
             </CardContent>
           </Card>
